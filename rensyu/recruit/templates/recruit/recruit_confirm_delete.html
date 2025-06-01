@@ -1,33 +1,152 @@
 {% extends 'base.html' %}
 
+{% block title %}応募者削除確認 - 採用管理システム{% endblock %}
+
 {% block content %}
-<div class="container mt-4">
-    <div class="row">
-        <div class="col-md-8 offset-md-2">
-            <div class="card">
-                <div class="card-header">
-                    <h2 class="mb-0">応募者情報の削除</h2>
+<div class="container mt-4 fade-in-up">
+    <!-- ページヘッダー -->
+    <div class="page-header">
+        <div class="d-flex align-items-center">
+            <a href="{% url 'recruit_list' %}" class="btn btn-outline-secondary me-3" title="戻る">
+                <i class="bi bi-arrow-left"></i>
+            </a>
+            <h1 class="page-title mb-0">
+                <i class="bi bi-trash text-danger"></i>
+                応募者削除確認
+            </h1>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-6 col-xl-5">
+            <!-- 警告カード -->
+            <div class="card border-danger">
+                <div class="card-header bg-danger text-white text-center">
+                    <i class="bi bi-exclamation-triangle-fill" style="font-size: 2.5rem;"></i>
+                    <h3 class="mt-2 mb-0">削除の確認</h3>
                 </div>
                 <div class="card-body">
-                    <p class="mb-4">以下の応募者情報を削除してもよろしいですか？</p>
-                    
-                    <div class="mb-4">
-                        <p><strong>名前：</strong>{{ recruit.name }}</p>
-                        <p><strong>ステータス：</strong>{{ recruit.status }}</p>
-                        <p><strong>応募日：</strong>{{ recruit.entry_day|date:"Y/n/j" }}</p>
-                        <p><strong>書類状況：</strong>{{ recruit.documents_status }}</p>
+                    <div class="text-center mb-4">
+                        <p class="text-muted mb-3">以下の応募者情報を削除しようとしています：</p>
+                        
+                        <!-- 削除対象の情報表示 -->
+                        <div class="bg-light rounded p-4 mb-4">
+                            <div class="row g-3">
+                                <div class="col-12">
+                                    <div class="d-flex align-items-center justify-content-center mb-3">
+                                        <div class="avatar-circle me-3" style="width: 60px; height: 60px; font-size: 1.5rem;">
+                                            {{ object.name|first }}
+                                        </div>
+                                        <div>
+                                            <h4 class="mb-1">{{ object.name }}</h4>
+                                            <span class="status-badge {{ object.status }}">{{ object.status }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <small class="text-muted d-block">応募日</small>
+                                    <strong>
+                                        <i class="bi bi-calendar3 me-1"></i>
+                                        {{ object.entry_day|date:"Y年n月j日" }}
+                                    </strong>
+                                </div>
+                                <div class="col-6">
+                                    <small class="text-muted d-block">書類状況</small>
+                                    <strong>
+                                        <i class="bi bi-file-earmark-text me-1"></i>
+                                        {{ object.documents_status }}
+                                    </strong>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
-                    <form method="post">
+                    <!-- 警告メッセージ -->
+                    <div class="alert alert-danger border-0" role="alert">
+                        <div class="d-flex">
+                            <i class="bi bi-exclamation-triangle-fill me-3 flex-shrink-0" style="font-size: 1.25rem;"></i>
+                            <div>
+                                <h6 class="alert-heading mb-2">重要な注意事項</h6>
+                                <ul class="mb-0 small">
+                                    <li>この操作は取り消すことができません</li>
+                                    <li>応募者の全ての情報が完全に削除されます</li>
+                                    <li>関連する履歴やデータも失われます</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 削除フォーム -->
+                    <form method="post" class="text-center">
                         {% csrf_token %}
-                        <div class="d-flex justify-content-between">
-                            <a href="{% url 'recruit_list' %}" class="btn btn-secondary">キャンセル</a>
-                            <button type="submit" class="btn btn-danger">削除</button>
+                        <div class="d-flex justify-content-center gap-3">
+                            <a href="{% url 'recruit_list' %}" class="btn btn-secondary btn-lg">
+                                <i class="bi bi-arrow-left me-1"></i>
+                                キャンセル
+                            </a>
+                            <button type="submit" class="btn btn-danger btn-lg" id="deleteBtn">
+                                <i class="bi bi-trash me-1"></i>
+                                削除する
+                            </button>
                         </div>
                     </form>
+                </div>
+            </div>
+
+            <!-- 代替案カード -->
+            <div class="card mt-4" style="background: linear-gradient(135deg, var(--gray-50) 0%, var(--white) 100%);">
+                <div class="card-body text-center">
+                    <i class="bi bi-lightbulb text-warning" style="font-size: 2rem;"></i>
+                    <h6 class="mt-2 mb-2">削除せずに管理する方法</h6>
+                    <p class="text-muted small mb-3">
+                        応募者情報を完全に削除する代わりに、ステータスを「不採用」に変更することも可能です。
+                        これにより、過去の採用活動の記録として保持できます。
+                    </p>
+                    <a href="{% url 'recruit_edit' object.pk %}" class="btn btn-outline-primary btn-sm">
+                        <i class="bi bi-pencil me-1"></i>
+                        編集して不採用にする
+                    </a>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const deleteBtn = document.getElementById('deleteBtn');
+    const form = document.querySelector('form');
+
+    // 削除ボタンにダブルクリック防止とローディング状態
+    form.addEventListener('submit', function(e) {
+        // 確認ダイアログ
+        if (!confirm('本当にこの応募者を削除しますか？\n\nこの操作は取り消すことができません。')) {
+            e.preventDefault();
+            return;
+        }
+
+        // ローディング状態
+        deleteBtn.innerHTML = '<i class="bi bi-hourglass-split me-1"></i>削除中...';
+        deleteBtn.disabled = true;
+        
+        // 二重送信防止
+        setTimeout(() => {
+            form.style.pointerEvents = 'none';
+        }, 100);
+    });
+
+    // ページ離脱時の警告（削除前のみ）
+    let formSubmitted = false;
+    form.addEventListener('submit', () => formSubmitted = true);
+    
+    window.addEventListener('beforeunload', function(e) {
+        if (!formSubmitted) {
+            e.preventDefault();
+            e.returnValue = '';
+        }
+    });
+});
+</script>
+{% endblock %}
 {% endblock %} 

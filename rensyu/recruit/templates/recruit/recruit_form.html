@@ -1,44 +1,217 @@
 {% extends 'base.html' %}
 
+{% block title %}
+{% if is_edit %}応募者情報編集{% else %}新規応募者登録{% endif %} - 採用管理システム
+{% endblock %}
+
 {% block content %}
-<div class="container mt-4">
-    <div class="row">
-        <div class="col-md-8 offset-md-2">
+<div class="container mt-4 fade-in-up">
+    <!-- ページヘッダー -->
+    <div class="page-header">
+        <div class="d-flex align-items-center">
+            <a href="{% url 'recruit_list' %}" class="btn btn-outline-secondary me-3" title="戻る">
+                <i class="bi bi-arrow-left"></i>
+            </a>
+            <h1 class="page-title mb-0">
+                {% if is_edit %}
+                    <i class="bi bi-pencil-square"></i>
+                    応募者情報編集
+                {% else %}
+                    <i class="bi bi-person-plus"></i>
+                    新規応募者登録
+                {% endif %}
+            </h1>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-xl-6">
             <div class="card">
-                <div class="card-header">
-                    <h2 class="mb-0">{% if is_edit %}応募者情報編集{% else %}新規応募者登録{% endif %}</h2>
+                <div class="card-header text-center">
+                    <h3 class="mb-0">
+                        {% if is_edit %}
+                            <i class="bi bi-person-gear text-gradient"></i>
+                            応募者情報を更新
+                        {% else %}
+                            <i class="bi bi-person-plus-fill text-gradient"></i>
+                            新しい応募者を追加
+                        {% endif %}
+                    </h3>
+                    <p class="text-muted mt-2 mb-0">
+                        {% if is_edit %}
+                            応募者の情報を最新の状態に更新してください。
+                        {% else %}
+                            すべての必要な情報を入力してください。
+                        {% endif %}
+                    </p>
                 </div>
                 <div class="card-body">
-                    <form method="post">
+                    <form method="post" class="needs-validation" novalidate>
                         {% csrf_token %}
-                        <div class="mb-3">
-                            <label for="{{ form.name.id_for_label }}" class="form-label">名前</label>
-                            {{ form.name.errors }}
+                        
+                        <!-- 名前 -->
+                        <div class="mb-4">
+                            <label for="{{ form.name.id_for_label }}" class="form-label">
+                                <i class="bi bi-person me-2"></i>
+                                応募者名
+                                <span class="text-danger">*</span>
+                            </label>
                             {{ form.name }}
+                            {% if form.name.errors %}
+                                <div class="text-danger mt-1">
+                                    {% for error in form.name.errors %}
+                                        <small><i class="bi bi-exclamation-circle me-1"></i>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            <div class="form-text">
+                                <i class="bi bi-info-circle me-1"></i>
+                                応募者のフルネームを入力してください
+                            </div>
                         </div>
-                        <div class="mb-3">
-                            <label for="{{ form.status.id_for_label }}" class="form-label">ステータス</label>
-                            {{ form.status.errors }}
+
+                        <!-- ステータス -->
+                        <div class="mb-4">
+                            <label for="{{ form.status.id_for_label }}" class="form-label">
+                                <i class="bi bi-flag me-2"></i>
+                                選考ステータス
+                                <span class="text-danger">*</span>
+                            </label>
                             {{ form.status }}
+                            {% if form.status.errors %}
+                                <div class="text-danger mt-1">
+                                    {% for error in form.status.errors %}
+                                        <small><i class="bi bi-exclamation-circle me-1"></i>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            <div class="form-text">
+                                <i class="bi bi-info-circle me-1"></i>
+                                現在の選考段階を選択してください
+                            </div>
                         </div>
-                        <div class="mb-3">
-                            <label for="{{ form.entry_day.id_for_label }}" class="form-label">応募日</label>
-                            {{ form.entry_day.errors }}
+
+                        <!-- 応募日 -->
+                        <div class="mb-4">
+                            <label for="{{ form.entry_day.id_for_label }}" class="form-label">
+                                <i class="bi bi-calendar-event me-2"></i>
+                                応募日
+                                <span class="text-danger">*</span>
+                            </label>
                             {{ form.entry_day }}
+                            {% if form.entry_day.errors %}
+                                <div class="text-danger mt-1">
+                                    {% for error in form.entry_day.errors %}
+                                        <small><i class="bi bi-exclamation-circle me-1"></i>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            <div class="form-text">
+                                <i class="bi bi-info-circle me-1"></i>
+                                応募を受け付けた日付を選択してください
+                            </div>
                         </div>
-                        <div class="mb-3">
-                            <label for="{{ form.documents_status.id_for_label }}" class="form-label">書類状況</label>
-                            {{ form.documents_status.errors }}
+
+                        <!-- 書類状況 -->
+                        <div class="mb-5">
+                            <label for="{{ form.documents_status.id_for_label }}" class="form-label">
+                                <i class="bi bi-file-earmark-text me-2"></i>
+                                書類提出状況
+                                <span class="text-danger">*</span>
+                            </label>
                             {{ form.documents_status }}
+                            {% if form.documents_status.errors %}
+                                <div class="text-danger mt-1">
+                                    {% for error in form.documents_status.errors %}
+                                        <small><i class="bi bi-exclamation-circle me-1"></i>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            <div class="form-text">
+                                <i class="bi bi-info-circle me-1"></i>
+                                提出された書類の状況を選択してください
+                            </div>
                         </div>
-                        <div class="d-flex justify-content-between">
-                            <a href="{% url 'recruit_list' %}" class="btn btn-secondary">戻る</a>
-                            <button type="submit" class="btn btn-primary">{% if is_edit %}更新{% else %}登録{% endif %}</button>
+
+                        <!-- ボタン -->
+                        <div class="d-flex justify-content-between align-items-center">
+                            <a href="{% url 'recruit_list' %}" class="btn btn-secondary">
+                                <i class="bi bi-arrow-left me-1"></i>
+                                キャンセル
+                            </a>
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                {% if is_edit %}
+                                    <i class="bi bi-check-square me-1"></i>
+                                    更新する
+                                {% else %}
+                                    <i class="bi bi-plus-circle me-1"></i>
+                                    登録する
+                                {% endif %}
+                            </button>
                         </div>
                     </form>
+                </div>
+            </div>
+
+            <!-- ヘルプカード -->
+            <div class="card mt-4" style="background: linear-gradient(135deg, var(--gray-50) 0%, var(--white) 100%);">
+                <div class="card-body text-center">
+                    <i class="bi bi-lightbulb text-warning" style="font-size: 2rem;"></i>
+                    <h6 class="mt-2 mb-2">ヘルプ</h6>
+                    <p class="text-muted small mb-0">
+                        入力でお困りの場合は、各項目の説明文をご確認ください。<br>
+                        それでも不明な点がございましたら、管理者にお問い合わせください。
+                    </p>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // フォームバリデーション
+    const form = document.querySelector('.needs-validation');
+    
+    form.addEventListener('submit', function(event) {
+        if (!form.checkValidity()) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+        form.classList.add('was-validated');
+    });
+
+    // フォーム要素にBootstrapクラスを追加
+    const formControls = form.querySelectorAll('input, select');
+    formControls.forEach(control => {
+        control.classList.add('form-control');
+        
+        // フォーカス時のエフェクト
+        control.addEventListener('focus', function() {
+            this.parentElement.style.transform = 'translateY(-2px)';
+            this.parentElement.style.transition = 'all 0.3s ease';
+        });
+        
+        control.addEventListener('blur', function() {
+            this.parentElement.style.transform = 'translateY(0)';
+        });
+    });
+
+    // selectボックスの場合はform-selectクラスを追加
+    const selects = form.querySelectorAll('select');
+    selects.forEach(select => {
+        select.classList.remove('form-control');
+        select.classList.add('form-select');
+    });
+
+    // 送信ボタンのローディング効果
+    const submitBtn = form.querySelector('button[type="submit"]');
+    form.addEventListener('submit', function() {
+        submitBtn.innerHTML = '<i class="bi bi-hourglass-split me-1"></i>処理中...';
+        submitBtn.disabled = true;
+    });
+});
+</script>
+{% endblock %}
 {% endblock %} 
