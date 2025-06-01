@@ -1,0 +1,8 @@
+SUPABASE_HOST=db.uihkeuofhqgbrajpuepb.supabase.co
+SUPABASE_PORT=5432
+SUPABASE_DB_NAME=postgres
+SUPABASE_DB_USER=postgres
+SUPABASE_DB_PASSWORD=emi-system0909
+
+SUPABASE_URL=https://uihkeuofhqgbrajpuepb.supabase.co
+SUPABASE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVpaGtldW9maHFnYnJhanB1ZXBiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDYzMjE5NTcsImV4cCI6MjA2MTg5Nzk1N30.ZMa31eSUxMvflhzOdhJvtHNWl5tYyY-xWYVkEDhA0pQ

@@ -1,0 +1,248 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>応募者一覧</h2>
+        <div>
+            <button type="button" class="btn btn-outline-primary me-2" data-bs-toggle="modal" data-bs-target="#searchModal">
+                <i class="bi bi-search"></i> 検索
+            </button>
+            <a href="{% url 'recruit_create' %}" class="btn btn-primary">新規登録</a>
+        </div>
+    </div>
+
+    {% if messages %}
+    <div class="messages mb-4" style="display: none;">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}" data-message="{{ message }}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th class="sortable" data-sort="name">
+                    名前
+                    {% if request.GET.sort == 'name' %}
+                        {% if request.GET.order == 'asc' %}
+                            <i class="bi bi-sort-alpha-down"></i>
+                        {% else %}
+                            <i class="bi bi-sort-alpha-up"></i>
+                        {% endif %}
+                    {% else %}
+                        <i class="bi bi-arrow-down-up"></i>
+                    {% endif %}
+                </th>
+                <th class="sortable" data-sort="status">
+                    ステータス
+                    {% if request.GET.sort == 'status' %}
+                        {% if request.GET.order == 'asc' %}
+                            <i class="bi bi-sort-alpha-down"></i>
+                        {% else %}
+                            <i class="bi bi-sort-alpha-up"></i>
+                        {% endif %}
+                    {% else %}
+                        <i class="bi bi-arrow-down-up"></i>
+                    {% endif %}
+                </th>
+                <th class="sortable" data-sort="entry_day">
+                    応募日
+                    {% if request.GET.sort == 'entry_day' %}
+                        {% if request.GET.order == 'asc' %}
+                            <i class="bi bi-sort-numeric-down"></i>
+                        {% else %}
+                            <i class="bi bi-sort-numeric-up"></i>
+                        {% endif %}
+                    {% else %}
+                        <i class="bi bi-arrow-down-up"></i>
+                    {% endif %}
+                </th>
+                <th class="sortable" data-sort="documents_status">
+                    書類状況
+                    {% if request.GET.sort == 'documents_status' %}
+                        {% if request.GET.order == 'asc' %}
+                            <i class="bi bi-sort-alpha-down"></i>
+                        {% else %}
+                            <i class="bi bi-sort-alpha-up"></i>
+                        {% endif %}
+                    {% else %}
+                        <i class="bi bi-arrow-down-up"></i>
+                    {% endif %}
+                </th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for recruit in recruits %}
+            <tr>
+                <td>{{ recruit.name }}</td>
+                <td>{{ recruit.status }}</td>
+                <td>{{ recruit.entry_day|date:"Y/n/j" }}</td>
+                <td>{{ recruit.documents_status }}</td>
+                <td>
+                    <div class="btn-group">
+                        <a href="{% url 'recruit_edit' recruit.pk %}" class="btn btn-sm btn-outline-primary">編集</a>
+                        <a href="{% url 'recruit_delete' recruit.pk %}" class="btn btn-sm btn-outline-danger">削除</a>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- 検索モーダル -->
+<div class="modal fade" id="searchModal" tabindex="-1" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="searchModalLabel">検索条件</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form method="get" class="row g-3">
+                    <div class="col-md-6">
+                        <label for="name" class="form-label">名前</label>
+                        <input type="text" class="form-control" id="name" name="name" value="{{ request.GET.name }}">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="status" class="form-label">ステータス</label>
+                        <select class="form-select" id="status" name="status">
+                            <option value="">すべて</option>
+                            <option value="書類選考中" {% if request.GET.status == '書類選考中' %}selected{% endif %}>書類選考中</option>
+                            <option value="一次面接" {% if request.GET.status == '一次面接' %}selected{% endif %}>一次面接</option>
+                            <option value="二次面接" {% if request.GET.status == '二次面接' %}selected{% endif %}>二次面接</option>
+                            <option value="最終面接" {% if request.GET.status == '最終面接' %}selected{% endif %}>最終面接</option>
+                            <option value="内定" {% if request.GET.status == '内定' %}selected{% endif %}>内定</option>
+                            <option value="不採用" {% if request.GET.status == '不採用' %}selected{% endif %}>不採用</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="entry_day" class="form-label">応募日</label>
+                        <input type="date" class="form-control" id="entry_day" name="entry_day" value="{{ request.GET.entry_day }}">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="documents_status" class="form-label">書類状況</label>
+                        <select class="form-select" id="documents_status" name="documents_status">
+                            <option value="">すべて</option>
+                            <option value="提出済み" {% if request.GET.documents_status == '提出済み' %}selected{% endif %}>提出済み</option>
+                            <option value="履歴書のみ" {% if request.GET.documents_status == '履歴書のみ' %}selected{% endif %}>履歴書のみ</option>
+                            <option value="職務経歴書のみ" {% if request.GET.documents_status == '職務経歴書のみ' %}selected{% endif %}>職務経歴書のみ</option>
+                            <option value="未提出" {% if request.GET.documents_status == '未提出' %}selected{% endif %}>未提出</option>
+                        </select>
+                    </div>
+                    <div class="col-12 text-end">
+                        <a href="{% url 'recruit_list' %}" class="btn btn-secondary">リセット</a>
+                        <button type="submit" class="btn btn-primary">検索実行</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- メッセージモーダル -->
+<div class="modal fade" id="messageModal" tabindex="-1" aria-labelledby="messageModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="messageModalLabel">お知らせ</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p id="modalMessage"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // メッセージモーダルの処理
+    const messages = document.querySelectorAll('.alert');
+    if (messages.length > 0) {
+        const lastMessage = messages[messages.length - 1];
+        const messageText = lastMessage.getAttribute('data-message');
+        const modal = new bootstrap.Modal(document.getElementById('messageModal'));
+        document.getElementById('modalMessage').textContent = messageText;
+        modal.show();
+
+        // メッセージモーダルが閉じられた後にバックドロップを削除
+        document.getElementById('messageModal').addEventListener('hidden.bs.modal', function () {
+            const backdrop = document.querySelector('.modal-backdrop');
+            if (backdrop) {
+                backdrop.remove();
+            }
+            document.body.classList.remove('modal-open');
+            document.body.style.overflow = '';
+            document.body.style.paddingRight = '';
+        });
+    }
+
+    // 検索モーダルの処理
+    const searchModal = document.getElementById('searchModal');
+    const searchModalInstance = new bootstrap.Modal(searchModal);
+
+    // 検索フォームの送信時にモーダルを閉じる
+    const searchForm = searchModal.querySelector('form');
+    searchForm.addEventListener('submit', function() {
+        searchModalInstance.hide();
+        // バックドロップを削除
+        const backdrop = document.querySelector('.modal-backdrop');
+        if (backdrop) {
+            backdrop.remove();
+        }
+        document.body.classList.remove('modal-open');
+        document.body.style.overflow = '';
+        document.body.style.paddingRight = '';
+    });
+
+    // 検索モーダルが閉じられた後にバックドロップを削除
+    searchModal.addEventListener('hidden.bs.modal', function () {
+        const backdrop = document.querySelector('.modal-backdrop');
+        if (backdrop) {
+            backdrop.remove();
+        }
+        document.body.classList.remove('modal-open');
+        document.body.style.overflow = '';
+        document.body.style.paddingRight = '';
+    });
+
+    // 並び替え機能
+    const sortableHeaders = document.querySelectorAll('.sortable');
+    sortableHeaders.forEach(header => {
+        header.addEventListener('click', function() {
+            const sort = this.dataset.sort;
+            const currentOrder = new URLSearchParams(window.location.search).get('order') || 'asc';
+            const newOrder = currentOrder === 'asc' ? 'desc' : 'asc';
+            
+            // 現在のURLパラメータを取得
+            const params = new URLSearchParams(window.location.search);
+            params.set('sort', sort);
+            params.set('order', newOrder);
+            
+            // 検索条件を維持
+            const searchParams = ['name', 'status', 'entry_day', 'documents_status'];
+            searchParams.forEach(param => {
+                const value = new URLSearchParams(window.location.search).get(param);
+                if (value) {
+                    params.set(param, value);
+                }
+            });
+            
+            // 新しいURLに遷移
+            window.location.href = `${window.location.pathname}?${params.toString()}`;
+        });
+    });
+});
+</script>
+{% endblock %}
+{% endblock %} 
