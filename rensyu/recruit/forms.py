@@ -65,6 +65,13 @@ class PersonalInfoForm(BaseRecruitForm):
         ('未提出', '未提出'),
     ]
 
+    OFFER_RESULT_CHOICES = [
+        ('', '選択してください'),
+        ('合格', '合格'),
+        ('不合格', '不合格'),
+        ('未', '未'),
+    ]
+
     JOB_TITLE_CHOICES = [
         ('', '選択してください'),
         ('エンジニア', 'エンジニア'),
@@ -265,14 +272,61 @@ class ProgressForm(BaseRecruitForm):
         required=False,
         widget=forms.Select(attrs={'class': 'form-select'})
     )
+    document_status = forms.ChoiceField(
+        label='提出書類',
+        choices=PersonalInfoForm.DOCUMENTS_STATUS_CHOICES,
+        required=False,
+        widget=forms.Select(attrs={'class': 'form-select'})
+    )
+    interview_day = forms.DateField(
+        label='面接日',
+        required=False,
+        widget=forms.DateInput(attrs={'type': 'date', 'class': 'form-control'})
+    )
+    interview_url = forms.URLField(
+        label='面接URL',
+        required=False,
+        widget=forms.URLInput(attrs={'class': 'form-control'})
+    )
+    interview_done = forms.BooleanField(
+        label='面接実施有無',
+        required=False,
+        widget=forms.CheckboxInput(attrs={'class': 'form-check-input'})
+    )
     interview_result = forms.ChoiceField(
         label='面接合否',
         choices=Recruit.INTERVIEW_RESULT_CHOICES,
         required=False,
         widget=forms.Select(attrs={'class': 'form-select'})
     )
-    offer_accepted = forms.BooleanField(
+    offer_day = forms.DateField(
+        label='オファー面談日程',
+        required=False,
+        widget=forms.DateInput(attrs={'type': 'date', 'class': 'form-control'})
+    )
+    offer_url = forms.URLField(
+        label='オファー面談URL',
+        required=False,
+        widget=forms.URLInput(attrs={'class': 'form-control'})
+    )
+    offer_done = forms.BooleanField(
+        label='オファ面参加有無',
+        required=False,
+        widget=forms.CheckboxInput(attrs={'class': 'form-check-input'})
+    )
+    offer_result = forms.ChoiceField(
         label='内定',
+        required=False,
+        choices=[
+            ('', '選択してください'),
+            ('合格', '合格'),
+            ('不合格', '不合格'),
+            ('未', '未'),
+        ],
+        widget=forms.Select(attrs={'class': 'form-select'})
+    )
+    offer_accepted = forms.BooleanField(
+        label='内定承諾',
         required=False,
         widget=forms.CheckboxInput(attrs={'class': 'form-check-input'})
     )
@@ -315,7 +369,9 @@ class ProgressForm(BaseRecruitForm):
     class Meta:
         model = Recruit
         fields = [
-            'status', 'document_result', 'interview_result', 'offer_accepted',
+            'status', 'document_result', 'document_status', 'interview_day',
+            'interview_url', 'interview_done', 'interview_result', 'offer_day',
+            'offer_url', 'offer_done', 'offer_result', 'offer_accepted',
             'media', 'sheet_response', 'interview_reminder_email',
             'interview_reminder_call', 'offer_reminder_email', 'offer_reminder_call'
         ]

@@ -130,7 +130,7 @@ class Recruit(models.Model):
         choices=REMINDER_CHOICES
     )
     offer_done = models.BooleanField(default=False, verbose_name='オファ面参加有無')
-    offer_result = models.CharField(max_length=50, blank=True, null=True, verbose_name='内定')
+    offer_result = models.BooleanField(default=False, verbose_name='内定')
     offer_manager = models.CharField(max_length=100, blank=True, null=True, verbose_name='オファー面談_担当者')
     offer_answer = models.TextField(blank=True, null=True, verbose_name='オファー面談_回答')
     offer_hold_date = models.DateField(blank=True, null=True, verbose_name='内定保留期日')
