@@ -164,9 +164,9 @@
                         <td>
                             <div class="d-flex align-items-center">
                                 <div class="avatar-circle me-2">
-                                    {{ recruit.name|first }}
+                                    {{ recruit.last_name|first }}
                                 </div>
-                                <strong>{{ recruit.name }}</strong>
+                                <strong>{{ recruit.last_name }} {{ recruit.first_name }}</strong>
                             </div>
                         </td>
                         <td>
@@ -179,14 +179,14 @@
                             {{ recruit.entry_day|date:"Y年n月j日" }}
                         </td>
                         <td>
-                            {% if recruit.documents_status == '提出済み' %}
+                            {% if recruit.document_status == '提出済み' %}
                                 <i class="bi bi-check-circle text-success me-1"></i>
-                            {% elif recruit.documents_status == '未提出' %}
+                            {% elif recruit.document_status == '未提出' %}
                                 <i class="bi bi-x-circle text-danger me-1"></i>
                             {% else %}
                                 <i class="bi bi-exclamation-circle text-warning me-1"></i>
                             {% endif %}
-                            {{ recruit.documents_status }}
+                            {{ recruit.document_status }}
                         </td>
                         <td>
                             <div class="btn-group" role="group">

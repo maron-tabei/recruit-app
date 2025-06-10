@@ -102,7 +102,7 @@
                         応募者情報を完全に削除する代わりに、ステータスを「不採用」に変更することも可能です。
                         これにより、過去の採用活動の記録として保持できます。
                     </p>
-                    <a href="{% url 'recruit_edit' object.pk %}" class="btn btn-outline-primary btn-sm">
+                    <a href="{% url 'recruit_edit' pk=object.pk %}" class="btn btn-outline-primary btn-sm">
                         <i class="bi bi-pencil me-1"></i>
                         編集して不採用にする
                     </a>
@@ -118,14 +118,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const deleteBtn = document.getElementById('deleteBtn');
     const form = document.querySelector('form');
 
-    // 削除ボタンにダブルクリック防止とローディング状態
+    // 削除ボタンにローディング状態のみを設定
     form.addEventListener('submit', function(e) {
-        // 確認ダイアログ
-        if (!confirm('本当にこの応募者を削除しますか？\n\nこの操作は取り消すことができません。')) {
-            e.preventDefault();
-            return;
-        }
-
         // ローディング状態
         deleteBtn.innerHTML = '<i class="bi bi-hourglass-split me-1"></i>削除中...';
         deleteBtn.disabled = true;

@@ -2,76 +2,60 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.db.models import Q
 from .models import Recruit
-from .forms import RecruitForm
+from .forms import PersonalInfoForm, ProgressForm, InterviewReportForm, OfferReportForm
 
-def index(request):
-    # 検索パラメータを取得
-    name = request.GET.get('name', '')
-    status = request.GET.get('status', '')
-    entry_day = request.GET.get('entry_day', '')
-    documents_status = request.GET.get('documents_status', '')
-
-    # 並び替えパラメータを取得
-    sort = request.GET.get('sort', 'entry_day')  # デフォルトは応募日
-    order = request.GET.get('order', 'desc')     # デフォルトは降順
-
-    # クエリセットを初期化
-    recruits = Recruit.objects.all()
-
-    # 検索条件を適用
-    if name:
-        recruits = recruits.filter(name__icontains=name)
-    if status:
-        recruits = recruits.filter(status=status)
-    if entry_day:
-        recruits = recruits.filter(entry_day=entry_day)
-    if documents_status:
-        recruits = recruits.filter(documents_status=documents_status)
-
-    # 並び替えを適用
-    if order == 'asc':
-        recruits = recruits.order_by(sort)
-    else:
-        recruits = recruits.order_by(f'-{sort}')
-
-    # 検索条件をコンテキストに追加
-    context = {
-        'recruits': recruits,
-        'search_params': {
-            'name': name,
-            'status': status,
-            'entry_day': entry_day,
-            'documents_status': documents_status,
-        }
-    }
-    
-    return render(request, 'recruit/index.html', context)
+def recruit_list(request):
+    recruits = Recruit.objects.all().order_by('-entry_day')
+    return render(request, 'recruit/index.html', {'recruits': recruits})
 
 def recruit_create(request):
     if request.method == 'POST':
-        form = RecruitForm(request.POST)
+        form = PersonalInfoForm(request.POST)
         if form.is_valid():
-            form.save()
-            return redirect('recruit_list')  # 一覧ページにリダイレクト
+            recruit = form.save()
+            messages.success(request, '応募者情報が正常に登録されました。')
+            return redirect('recruit_list')
     else:
-        form = RecruitForm()
-    
-    return render(request, 'recruit/recruit_form.html', {'form': form})
+        form = PersonalInfoForm()
+    return render(request, 'recruit/recruit_form.html', {'form': form, 'is_edit': False})
 
 def recruit_edit(request, pk):
     recruit = get_object_or_404(Recruit, pk=pk)
+    form_type = request.GET.get('form_type', 'personal')
+    
     if request.method == 'POST':
-        form = RecruitForm(request.POST, instance=recruit)
+        if form_type == 'personal':
+            form = PersonalInfoForm(request.POST, instance=recruit)
+        elif form_type == 'progress':
+            form = ProgressForm(request.POST, instance=recruit)
+        elif form_type == 'interview':
+            form = InterviewReportForm(request.POST, instance=recruit)
+        elif form_type == 'offer':
+            form = OfferReportForm(request.POST, instance=recruit)
+        else:
+            form = PersonalInfoForm(request.POST, instance=recruit)
+            
         if form.is_valid():
             form.save()
+            messages.success(request, '応募者情報が正常に更新されました。')
             return redirect('recruit_list')
     else:
-        form = RecruitForm(instance=recruit)
-    
+        if form_type == 'personal':
+            form = PersonalInfoForm(instance=recruit)
+        elif form_type == 'progress':
+            form = ProgressForm(instance=recruit)
+        elif form_type == 'interview':
+            form = InterviewReportForm(instance=recruit)
+        elif form_type == 'offer':
+            form = OfferReportForm(instance=recruit)
+        else:
+            form = PersonalInfoForm(instance=recruit)
+            
     return render(request, 'recruit/recruit_form.html', {
         'form': form,
         'recruit': recruit,
-        'is_edit': True
+        'is_edit': True,
+        'form_type': form_type
     })
 
 def recruit_delete(request, pk):
@@ -82,5 +66,18 @@ def recruit_delete(request, pk):
         return redirect('recruit_list')
     
     return render(request, 'recruit/recruit_confirm_delete.html', {
-        'recruit': recruit
+        'object': recruit
     })
+
+def recruit_search(request):
+    query = request.GET.get('q', '')
+    if query:
+        recruits = Recruit.objects.filter(
+            Q(last_name__icontains=query) |
+            Q(first_name__icontains=query) |
+            Q(last_name_kana__icontains=query) |
+            Q(first_name_kana__icontains=query)
+        ).order_by('-entry_day')
+    else:
+        recruits = Recruit.objects.all().order_by('-entry_day')
+    return render(request, 'recruit/index.html', {'recruits': recruits, 'query': query})

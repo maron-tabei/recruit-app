@@ -1,7 +1,245 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}
 {% if is_edit %}応募者情報編集{% else %}新規応募者登録{% endif %} - 採用管理システム
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* タブナビゲーションのスタイル */
+    .nav-tabs {
+        border-bottom: 2px solid #dee2e6;
+        margin-bottom: 1.5rem;
+    }
+
+    .nav-tabs .nav-link {
+        border: none;
+        color: #212529;
+        background-color: #adb5bd;
+        padding: 0.75rem 1.5rem;
+        margin-right: 0.5rem;
+        border-radius: 0.5rem 0.5rem 0 0;
+        transition: all 0.3s ease;
+    }
+
+    .nav-tabs .nav-link:hover {
+        background-color: #6c757d;
+        color: #ffffff;
+    }
+
+    .nav-tabs .nav-link.active {
+        color: #ffffff;
+        background-color: #0d6efd;
+        border: none;
+        font-weight: 500;
+    }
+
+    .nav-tabs .nav-link.active:hover {
+        background-color: #0b5ed7;
+    }
+
+    .nav-tabs .nav-link i {
+        color: #ffffff;
+    }
+
+    .tab-content {
+        padding: 1.5rem;
+        background-color: #ffffff;
+        border-radius: 0 0.5rem 0.5rem 0.5rem;
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    }
+
+    .tab-pane {
+        display: none;
+    }
+
+    .tab-pane.active {
+        display: block;
+    }
+
+    /* カードのスタイル */
+    .card {
+        border: none;
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        border-radius: 0.5rem;
+    }
+
+    .card-header {
+        background-color: #f8f9fa;
+        border-bottom: 1px solid #dee2e6;
+        padding: 1rem;
+    }
+
+    .card-body {
+        padding: 1.5rem;
+    }
+
+    /* フォームのスタイル */
+    .form-label {
+        font-weight: 500;
+        color: #495057;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-control, .form-select {
+        border: 1px solid #ced4da;
+        border-radius: 0.375rem;
+        padding: 0.5rem 0.75rem;
+        transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: #86b7fe;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    }
+
+    .form-check {
+        margin-bottom: 0.5rem;
+    }
+
+    .form-check-input {
+        margin-top: 0.25rem;
+    }
+
+    .form-check-label {
+        color: #495057;
+    }
+
+    /* エラーメッセージのスタイル */
+    .text-danger {
+        color: #dc3545 !important;
+    }
+
+    .text-danger i {
+        margin-right: 0.25rem;
+    }
+
+    /* ボタンのスタイル */
+    .btn {
+        padding: 0.5rem 1rem;
+        font-weight: 500;
+        border-radius: 0.375rem;
+        transition: all 0.2s ease-in-out;
+    }
+
+    .btn-primary {
+        background-color: #0d6efd;
+        border-color: #0d6efd;
+        padding: 0.5rem 1.5rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover {
+        background-color: #0b5ed7;
+        border-color: #0a58ca;
+        transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+        background-color: #6c757d;
+        border-color: #6c757d;
+        padding: 0.5rem 1.5rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .btn-secondary:hover {
+        background-color: #5c636a;
+        border-color: #565e64;
+        transform: translateY(-1px);
+    }
+
+    /* アイコンのスタイル */
+    .bi {
+        margin-right: 0.5rem;
+        color: #6c757d;
+    }
+
+    /* 必須項目のマーク */
+    .text-danger.required {
+        color: #dc3545;
+        margin-left: 0.25rem;
+    }
+
+    /* タブコンテンツのアニメーション */
+    .tab-content > .tab-pane {
+        transition: all 0.3s ease-in-out;
+    }
+
+    .tab-content > .active {
+        display: block;
+        opacity: 1;
+    }
+
+    /* フォームグループのスタイル */
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    /* テキストエリアのスタイル */
+    textarea.form-control {
+        min-height: 100px;
+    }
+
+    /* セクションタイトルのスタイル */
+    .section-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #212529;
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #dee2e6;
+    }
+
+    /* レスポンシブ対応 */
+    @media (max-width: 768px) {
+        .nav-tabs .nav-link {
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+        }
+        
+        .tab-content {
+            padding: 1rem;
+        }
+    }
+
+    .form-select-wrapper {
+        position: relative;
+    }
+    .form-select-wrapper select {
+        width: 100%;
+        padding: 0.375rem 0.75rem;
+        font-size: 1rem;
+        font-weight: 400;
+        line-height: 1.5;
+        color: #212529;
+        background-color: #fff;
+        background-clip: padding-box;
+        border: 1px solid #ced4da;
+        border-radius: 0.25rem;
+        transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+    }
+    .form-select-wrapper select:focus {
+        color: #212529;
+        background-color: #fff;
+        border-color: #86b7fe;
+        outline: 0;
+        box-shadow: 0 0 0 0.25rem rgba(13,110,253,.25);
+    }
+    .form-check {
+        display: flex;
+        align-items: center;
+        padding-left: 0;
+    }
+    .form-check-input {
+        margin-right: 0.5rem;
+    }
+    .form-check-label {
+        margin-bottom: 0;
+    }
+</style>
 {% endblock %}
 
 {% block content %}
@@ -25,7 +263,7 @@
     </div>
 
     <div class="row justify-content-center">
-        <div class="col-lg-8 col-xl-6">
+        <div class="col-lg-10 col-xl-8">
             <div class="card">
                 <div class="card-header text-center">
                     <h3 class="mb-0">
@@ -49,92 +287,68 @@
                     <form method="post" class="needs-validation" novalidate>
                         {% csrf_token %}
                         
-                        <!-- 名前 -->
-                        <div class="mb-4">
-                            <label for="{{ form.name.id_for_label }}" class="form-label">
-                                <i class="bi bi-person me-2"></i>
-                                応募者名
-                                <span class="text-danger">*</span>
-                            </label>
-                            {{ form.name }}
-                            {% if form.name.errors %}
-                                <div class="text-danger mt-1">
-                                    {% for error in form.name.errors %}
-                                        <small><i class="bi bi-exclamation-circle me-1"></i>{{ error }}</small>
-                                    {% endfor %}
-                                </div>
-                            {% endif %}
-                            <div class="form-text">
-                                <i class="bi bi-info-circle me-1"></i>
-                                応募者のフルネームを入力してください
-                            </div>
-                        </div>
+                        {% if is_edit %}
+                        <!-- カテゴリ選択タブ -->
+                        <ul class="nav nav-tabs mb-4" id="formTabs" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link {% if form_type == 'personal' %}active{% endif %}" 
+                                        id="personal-tab" data-bs-toggle="tab" data-bs-target="#personal" type="button" role="tab"
+                                        aria-controls="personal" aria-selected="{% if form_type == 'personal' %}true{% else %}false{% endif %}">
+                                    <i class="bi bi-person me-2"></i>個人情報
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link {% if form_type == 'progress' %}active{% endif %}" 
+                                        id="progress-tab" data-bs-toggle="tab" data-bs-target="#progress" type="button" role="tab"
+                                        aria-controls="progress" aria-selected="{% if form_type == 'progress' %}true{% else %}false{% endif %}">
+                                    <i class="bi bi-clipboard-check me-2"></i>進捗管理
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link {% if form_type == 'interview' %}active{% endif %}" 
+                                        id="interview-tab" data-bs-toggle="tab" data-bs-target="#interview" type="button" role="tab"
+                                        aria-controls="interview" aria-selected="{% if form_type == 'interview' %}true{% else %}false{% endif %}">
+                                    <i class="bi bi-calendar-check me-2"></i>面接報告
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link {% if form_type == 'offer' %}active{% endif %}" 
+                                        id="offer-tab" data-bs-toggle="tab" data-bs-target="#offer" type="button" role="tab"
+                                        aria-controls="offer" aria-selected="{% if form_type == 'offer' %}true{% else %}false{% endif %}">
+                                    <i class="bi bi-hand-thumbs-up me-2"></i>オファ面報告
+                                </button>
+                            </li>
+                        </ul>
+                        {% endif %}
 
-                        <!-- ステータス -->
-                        <div class="mb-4">
-                            <label for="{{ form.status.id_for_label }}" class="form-label">
-                                <i class="bi bi-flag me-2"></i>
-                                選考ステータス
-                                <span class="text-danger">*</span>
-                            </label>
-                            {{ form.status }}
-                            {% if form.status.errors %}
-                                <div class="text-danger mt-1">
-                                    {% for error in form.status.errors %}
-                                        <small><i class="bi bi-exclamation-circle me-1"></i>{{ error }}</small>
-                                    {% endfor %}
-                                </div>
-                            {% endif %}
-                            <div class="form-text">
-                                <i class="bi bi-info-circle me-1"></i>
-                                現在の選考段階を選択してください
+                        <div class="tab-content" id="formTabsContent">
+                            <!-- 個人情報フォーム -->
+                            <div class="tab-pane fade {% if form_type == 'personal' or not is_edit %}show active{% endif %}" 
+                                 id="personal" role="tabpanel" aria-labelledby="personal-tab">
+                                {% include "recruit/partials/personal_info_form.html" %}
                             </div>
-                        </div>
 
-                        <!-- 応募日 -->
-                        <div class="mb-4">
-                            <label for="{{ form.entry_day.id_for_label }}" class="form-label">
-                                <i class="bi bi-calendar-event me-2"></i>
-                                応募日
-                                <span class="text-danger">*</span>
-                            </label>
-                            {{ form.entry_day }}
-                            {% if form.entry_day.errors %}
-                                <div class="text-danger mt-1">
-                                    {% for error in form.entry_day.errors %}
-                                        <small><i class="bi bi-exclamation-circle me-1"></i>{{ error }}</small>
-                                    {% endfor %}
-                                </div>
-                            {% endif %}
-                            <div class="form-text">
-                                <i class="bi bi-info-circle me-1"></i>
-                                応募を受け付けた日付を選択してください
+                            <!-- 進捗管理フォーム -->
+                            <div class="tab-pane fade {% if form_type == 'progress' %}show active{% endif %}" 
+                                 id="progress" role="tabpanel" aria-labelledby="progress-tab">
+                                {% include "recruit/partials/progress_form.html" %}
                             </div>
-                        </div>
 
-                        <!-- 書類状況 -->
-                        <div class="mb-5">
-                            <label for="{{ form.documents_status.id_for_label }}" class="form-label">
-                                <i class="bi bi-file-earmark-text me-2"></i>
-                                書類提出状況
-                                <span class="text-danger">*</span>
-                            </label>
-                            {{ form.documents_status }}
-                            {% if form.documents_status.errors %}
-                                <div class="text-danger mt-1">
-                                    {% for error in form.documents_status.errors %}
-                                        <small><i class="bi bi-exclamation-circle me-1"></i>{{ error }}</small>
-                                    {% endfor %}
-                                </div>
-                            {% endif %}
-                            <div class="form-text">
-                                <i class="bi bi-info-circle me-1"></i>
-                                提出された書類の状況を選択してください
+                            <!-- 面接報告フォーム -->
+                            <div class="tab-pane fade {% if form_type == 'interview' %}show active{% endif %}" 
+                                 id="interview" role="tabpanel" aria-labelledby="interview-tab">
+                                {% include "recruit/partials/interview_form.html" %}
+                            </div>
+
+                            <!-- オファ面報告フォーム -->
+                            <div class="tab-pane fade {% if form_type == 'offer' %}show active{% endif %}" 
+                                 id="offer" role="tabpanel" aria-labelledby="offer-tab">
+                                {% include "recruit/partials/offer_form.html" %}
                             </div>
                         </div>
 
                         <!-- ボタン -->
-                        <div class="d-flex justify-content-between align-items-center">
+                        <div class="d-flex justify-content-between align-items-center mt-4">
                             <a href="{% url 'recruit_list' %}" class="btn btn-secondary">
                                 <i class="bi bi-arrow-left me-1"></i>
                                 キャンセル
@@ -150,18 +364,6 @@
                             </button>
                         </div>
                     </form>
-                </div>
-            </div>
-
-            <!-- ヘルプカード -->
-            <div class="card mt-4" style="background: linear-gradient(135deg, var(--gray-50) 0%, var(--white) 100%);">
-                <div class="card-body text-center">
-                    <i class="bi bi-lightbulb text-warning" style="font-size: 2rem;"></i>
-                    <h6 class="mt-2 mb-2">ヘルプ</h6>
-                    <p class="text-muted small mb-0">
-                        入力でお困りの場合は、各項目の説明文をご確認ください。<br>
-                        それでも不明な点がございましたら、管理者にお問い合わせください。
-                    </p>
                 </div>
             </div>
         </div>
@@ -182,34 +384,14 @@ document.addEventListener('DOMContentLoaded', function() {
         form.classList.add('was-validated');
     });
 
-    // フォーム要素にBootstrapクラスを追加
-    const formControls = form.querySelectorAll('input, select');
-    formControls.forEach(control => {
-        control.classList.add('form-control');
-        
-        // フォーカス時のエフェクト
-        control.addEventListener('focus', function() {
-            this.parentElement.style.transform = 'translateY(-2px)';
-            this.parentElement.style.transition = 'all 0.3s ease';
+    // Bootstrapのタブ機能を初期化
+    const triggerTabList = [].slice.call(document.querySelectorAll('#formTabs button'));
+    triggerTabList.forEach(function(triggerEl) {
+        const tabTrigger = new bootstrap.Tab(triggerEl);
+        triggerEl.addEventListener('click', function(event) {
+            event.preventDefault();
+            tabTrigger.show();
         });
-        
-        control.addEventListener('blur', function() {
-            this.parentElement.style.transform = 'translateY(0)';
-        });
-    });
-
-    // selectボックスの場合はform-selectクラスを追加
-    const selects = form.querySelectorAll('select');
-    selects.forEach(select => {
-        select.classList.remove('form-control');
-        select.classList.add('form-select');
-    });
-
-    // 送信ボタンのローディング効果
-    const submitBtn = form.querySelector('button[type="submit"]');
-    form.addEventListener('submit', function() {
-        submitBtn.innerHTML = '<i class="bi bi-hourglass-split me-1"></i>処理中...';
-        submitBtn.disabled = true;
     });
 });
 </script>
