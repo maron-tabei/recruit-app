@@ -1,5 +1,6 @@
 from django.db import models
 from datetime import date
+from django.utils import timezone
 
 # Create your models here.
 
@@ -58,7 +59,7 @@ class Recruit(models.Model):
     
     memo = models.TextField(blank=True, null=True, verbose_name='備考')
     job_title = models.CharField(max_length=100, blank=True, null=True, verbose_name='職種')
-    entry_day = models.DateField(default=date.today, verbose_name='応募日')
+    entry_day = models.DateField(default=timezone.now, verbose_name='応募日')
     
     # 個人情報
     last_name = models.CharField(max_length=100, verbose_name='姓', default='')
@@ -184,8 +185,15 @@ class Recruit(models.Model):
     side_job = models.TextField(blank=True, null=True, verbose_name='副業相談')
     sheet_response = models.BooleanField(default=False, verbose_name='シート回答')
 
+    created_at = models.DateTimeField('作成日時', default=timezone.now)
+    updated_at = models.DateTimeField('更新日時', default=timezone.now)
+
     def __str__(self):
         return f"{self.last_name} {self.first_name}"
+
+    def save(self, *args, **kwargs):
+        self.updated_at = timezone.now()
+        super().save(*args, **kwargs)
 
     class Meta:
         verbose_name = '応募者'

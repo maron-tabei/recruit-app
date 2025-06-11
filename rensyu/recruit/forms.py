@@ -3,29 +3,33 @@ from .models import Recruit
 import re
 
 class BaseRecruitForm(forms.ModelForm):
-    # 全角数字を半角に変換する関数
-    def to_half_width(self, value):
-        if value is None:
-            return value
-        # 全角数字を半角に変換
-        value = str(value)
-        value = value.translate(str.maketrans('０１２３４５６７８９', '0123456789'))
-        # 全角スペースを半角に変換
-        value = value.translate(str.maketrans('　', ' '))
-        # 全角ハイフンや括弧を半角に変換
-        value = value.translate(str.maketrans('－（）', '-()'))
-        return value
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # 必須フィールドにマークを追加
+        for field_name, field in self.fields.items():
+            if not field.required:
+                field.label = f"{field.label}（任意）"
+
+    def clean(self):
+        cleaned_data = super().clean()
+        # 日付フィールドのバリデーション
+        for field_name in ['interview_day', 'offer_day', 'offer_hold_date']:
+            if field_name in cleaned_data and cleaned_data[field_name]:
+                try:
+                    cleaned_data[field_name]
+                except (ValueError, TypeError):
+                    self.add_error(field_name, '有効な日付を入力してください。')
+        return cleaned_data
 
     def clean_age(self):
         age = self.cleaned_data.get('age')
-        if age:
-            # 文字列に変換して全角を半角に変換
-            age_str = self.to_half_width(str(age))
-            # 数字以外の文字を削除
-            age_str = re.sub(r'[^\d]', '', age_str)
+        if age is not None:
             try:
-                return int(age_str)
-            except ValueError:
+                age = int(str(age).translate(str.maketrans('０１２３４５６７８９', '0123456789')))
+                if age < 0 or age > 150:
+                    raise forms.ValidationError('有効な年齢を入力してください。')
+                return age
+            except (ValueError, TypeError):
                 raise forms.ValidationError('有効な年齢を入力してください。')
         return age
 
@@ -33,11 +37,25 @@ class BaseRecruitForm(forms.ModelForm):
         mobile_number = self.cleaned_data.get('mobile_number')
         if mobile_number:
             # 全角を半角に変換
-            mobile_number = self.to_half_width(mobile_number)
+            mobile_number = str(mobile_number).translate(str.maketrans('０１２３４５６７８９', '0123456789'))
             # 数字、ハイフン、括弧以外の文字を削除
             mobile_number = re.sub(r'[^\d\-()]', '', mobile_number)
+            if len(mobile_number) < 10:
+                raise forms.ValidationError('有効な電話番号を入力してください。')
             return mobile_number
         return mobile_number
+
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if email:
+            try:
+                # メールアドレスの形式をチェック
+                if '@' not in email or '.' not in email:
+                    raise forms.ValidationError('有効なメールアドレスを入力してください。')
+                return email
+            except Exception:
+                raise forms.ValidationError('有効なメールアドレスを入力してください。')
+        return email
 
     class Meta:
         model = Recruit
@@ -206,6 +224,11 @@ class PersonalInfoForm(BaseRecruitForm):
         label='メモ',
         required=False,
         widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 3})
+    )
+    entry_day = forms.DateField(
+        label='応募日',
+        required=False,
+        widget=forms.DateInput(attrs={'type': 'date', 'class': 'form-control'})
     )
 
     class Meta:
