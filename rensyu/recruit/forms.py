@@ -2,6 +2,7 @@ from django import forms
 from .models import Recruit
 import re
 
+# 基本フォームクラス：すべてのフォームの基底クラス
 class BaseRecruitForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -21,10 +22,12 @@ class BaseRecruitForm(forms.ModelForm):
                     self.add_error(field_name, '有効な日付を入力してください。')
         return cleaned_data
 
+    # 年齢のバリデーション
     def clean_age(self):
         age = self.cleaned_data.get('age')
         if age is not None:
             try:
+                # 全角数字を半角に変換
                 age = int(str(age).translate(str.maketrans('０１２３４５６７８９', '0123456789')))
                 if age < 0 or age > 150:
                     raise forms.ValidationError('有効な年齢を入力してください。')
@@ -33,6 +36,7 @@ class BaseRecruitForm(forms.ModelForm):
                 raise forms.ValidationError('有効な年齢を入力してください。')
         return age
 
+    # 電話番号のバリデーション
     def clean_mobile_number(self):
         mobile_number = self.cleaned_data.get('mobile_number')
         if mobile_number:
@@ -45,6 +49,7 @@ class BaseRecruitForm(forms.ModelForm):
             return mobile_number
         return mobile_number
 
+    # メールアドレスのバリデーション
     def clean_email(self):
         email = self.cleaned_data.get('email')
         if email:
@@ -61,7 +66,9 @@ class BaseRecruitForm(forms.ModelForm):
         model = Recruit
         fields = []
 
+# 基本情報フォーム：応募者の基本情報を管理
 class PersonalInfoForm(BaseRecruitForm):
+    # 選考進捗の選択肢
     STATUS_CHOICES = [
         ('新規応募', '新規応募'),
         ('書類選考NG', '書類選考NG'),
@@ -75,6 +82,7 @@ class PersonalInfoForm(BaseRecruitForm):
         ('内定承諾', '内定承諾'),
     ]
 
+    # 提出書類の選択肢
     DOCUMENTS_STATUS_CHOICES = [
         ('', '選択してください'),
         ('提出済み', '提出済み'),
@@ -83,6 +91,7 @@ class PersonalInfoForm(BaseRecruitForm):
         ('未提出', '未提出'),
     ]
 
+    # オファー結果の選択肢
     OFFER_RESULT_CHOICES = [
         ('', '選択してください'),
         ('合格', '合格'),
@@ -90,6 +99,7 @@ class PersonalInfoForm(BaseRecruitForm):
         ('未', '未'),
     ]
 
+    # 職種の選択肢
     JOB_TITLE_CHOICES = [
         ('', '選択してください'),
         ('エンジニア', 'エンジニア'),
@@ -97,6 +107,7 @@ class PersonalInfoForm(BaseRecruitForm):
         ('クリエイター', 'クリエイター'),
     ]
 
+    # 性別の選択肢
     GENDER_CHOICES = [
         ('', '選択してください'),
         ('男', '男'),
@@ -104,6 +115,7 @@ class PersonalInfoForm(BaseRecruitForm):
         ('不明', '不明'),
     ]
 
+    # 都道府県の選択肢
     PREFECTURE_CHOICES = [
         ('', '選択してください'),
         ('北海道', '北海道'),
@@ -155,25 +167,31 @@ class PersonalInfoForm(BaseRecruitForm):
         ('沖縄県', '沖縄県'),
     ]
 
+    # 基本情報のフィールド定義
     last_name = forms.CharField(
         label='姓',
+        required=True,
         widget=forms.TextInput(attrs={'class': 'form-control'})
     )
     first_name = forms.CharField(
         label='名',
+        required=True,
         widget=forms.TextInput(attrs={'class': 'form-control'})
     )
     last_name_kana = forms.CharField(
         label='セイ',
+        required=True,
         widget=forms.TextInput(attrs={'class': 'form-control'})
     )
     first_name_kana = forms.CharField(
         label='メイ',
+        required=True,
         widget=forms.TextInput(attrs={'class': 'form-control'})
     )
     status = forms.ChoiceField(
         label='選考進捗',
         choices=STATUS_CHOICES,
+        required=True,
         widget=forms.Select(attrs={'class': 'form-control'})
     )
     document_status = forms.ChoiceField(
@@ -282,61 +300,81 @@ class PersonalInfoForm(BaseRecruitForm):
             'side_job': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
         }
 
+# 進捗管理フォーム：選考の進捗状況を管理するフォームクラス
+# 書類選考、面接、オファー面談の各段階の情報を管理
 class ProgressForm(BaseRecruitForm):
+    # 選考進捗のフィールド
+    # 応募者の現在の選考ステータスを管理（新規応募、書類選考中、面接中など）
     status = forms.ChoiceField(
         label='選考進捗',
         choices=Recruit.STATUS_CHOICES,
         required=False,
         widget=forms.Select(attrs={'class': 'form-select'})
     )
+
+    # 書類選考のフィールド
+    # 書類選考の合否結果を管理（合格、不合格、未判定など）
     document_result = forms.ChoiceField(
         label='書類選考合否',
         choices=Recruit.DOCUMENT_RESULT_CHOICES,
         required=False,
         widget=forms.Select(attrs={'class': 'form-select'})
     )
+    # 提出書類の状態を管理（提出済み、履歴書のみ、未提出など）
     document_status = forms.ChoiceField(
         label='提出書類',
         choices=PersonalInfoForm.DOCUMENTS_STATUS_CHOICES,
         required=False,
         widget=forms.Select(attrs={'class': 'form-select'})
     )
+
+    # 面接情報のフィールド
+    # 面接の実施日を管理
     interview_day = forms.DateField(
         label='面接日',
         required=False,
         widget=forms.DateInput(attrs={'type': 'date', 'class': 'form-control'})
     )
+    # オンライン面接のURLを管理
     interview_url = forms.URLField(
         label='面接URL',
         required=False,
         widget=forms.URLInput(attrs={'class': 'form-control'})
     )
+    # 面接の実施有無を管理（チェックボックス）
     interview_done = forms.BooleanField(
         label='面接実施有無',
         required=False,
         widget=forms.CheckboxInput(attrs={'class': 'form-check-input'})
     )
+    # 面接の合否結果を管理（合格、不合格、未判定など）
     interview_result = forms.ChoiceField(
         label='面接合否',
         choices=Recruit.INTERVIEW_RESULT_CHOICES,
         required=False,
         widget=forms.Select(attrs={'class': 'form-select'})
     )
+
+    # オファー情報のフィールド
+    # オファー面談の実施日を管理
     offer_day = forms.DateField(
         label='オファー面談日程',
         required=False,
         widget=forms.DateInput(attrs={'type': 'date', 'class': 'form-control'})
     )
+    # オンラインオファー面談のURLを管理
     offer_url = forms.URLField(
         label='オファー面談URL',
         required=False,
         widget=forms.URLInput(attrs={'class': 'form-control'})
     )
+    # オファー面談の参加有無を管理（チェックボックス）
     offer_done = forms.BooleanField(
         label='オファ面参加有無',
         required=False,
         widget=forms.CheckboxInput(attrs={'class': 'form-check-input'})
     )
+    # オファー面談の結果を管理（合格、不合格、未判定など）
     offer_result = forms.ChoiceField(
         label='内定',
         required=False,
@@ -348,40 +386,36 @@ class ProgressForm(BaseRecruitForm):
         ],
         widget=forms.Select(attrs={'class': 'form-select'})
     )
+    # 内定の承諾有無を管理（チェックボックス）
     offer_accepted = forms.BooleanField(
         label='内定承諾',
         required=False,
         widget=forms.CheckboxInput(attrs={'class': 'form-check-input'})
     )
-    media = forms.ChoiceField(
-        label='媒体',
-        choices=Recruit.MEDIA_CHOICES,
-        required=False,
-        widget=forms.Select(attrs={'class': 'form-select'})
-    )
-    sheet_response = forms.BooleanField(
-        label='シート回答',
-        required=False,
-        widget=forms.CheckboxInput(attrs={'class': 'form-check-input'})
-    )
+
+    # リマインド設定のフィールド
+    # 面接前のメールリマインド設定を管理（前日、当日など）
     interview_reminder_email = forms.ChoiceField(
         label='面接リマインドメール',
         choices=Recruit.REMINDER_CHOICES,
         required=False,
         widget=forms.Select(attrs={'class': 'form-select'})
     )
+    # 面接前の電話リマインド設定を管理（前日、当日など）
     interview_reminder_call = forms.ChoiceField(
         label='面接リマインド電話',
         choices=Recruit.REMINDER_CHOICES,
         required=False,
         widget=forms.Select(attrs={'class': 'form-select'})
     )
+    # オファー面談前のメールリマインド設定を管理（前日、当日など）
     offer_reminder_email = forms.ChoiceField(
         label='オファー面談リマインドメール',
         choices=Recruit.REMINDER_CHOICES,
         required=False,
         widget=forms.Select(attrs={'class': 'form-select'})
     )
+    # オファー面談前の電話リマインド設定を管理（前日、当日など）
     offer_reminder_call = forms.ChoiceField(
         label='オファー面談リマインド電話',
         choices=Recruit.REMINDER_CHOICES,
@@ -389,17 +423,36 @@ class ProgressForm(BaseRecruitForm):
         widget=forms.Select(attrs={'class': 'form-select'})
     )
 
+    # その他の情報フィールド
+    # 応募媒体を管理（求人サイト、紹介など）
+    media = forms.ChoiceField(
+        label='媒体',
+        choices=Recruit.MEDIA_CHOICES,
+        required=False,
+        widget=forms.Select(attrs={'class': 'form-select'})
+    )
+    # 応募シートの回答有無を管理（チェックボックス）
+    sheet_response = forms.BooleanField(
+        label='シート回答',
+        required=False,
+        widget=forms.CheckboxInput(attrs={'class': 'form-check-input'})
+    )
+
     class Meta:
         model = Recruit
+        # フォームで使用するフィールドの定義
         fields = [
-            'status', 'document_result', 'document_status', 'interview_day',
-            'interview_url', 'interview_done', 'interview_result', 'offer_day',
-            'offer_url', 'offer_done', 'offer_result', 'offer_accepted',
-            'media', 'sheet_response', 'interview_reminder_email',
-            'interview_reminder_call', 'offer_reminder_email', 'offer_reminder_call'
+            'status', 'document_result', 'document_status',
+            'interview_day', 'interview_url', 'interview_done', 'interview_result',
+            'offer_day', 'offer_url', 'offer_done', 'offer_result', 'offer_accepted',
+            'interview_reminder_email', 'interview_reminder_call',
+            'offer_reminder_email', 'offer_reminder_call',
+            'media', 'sheet_response'
         ]
 
+# 面接報告フォーム：面接の詳細情報を管理
 class InterviewReportForm(BaseRecruitForm):
+    # 面接基本情報
     interview_day = forms.DateField(
         label='面接日',
         required=False,
@@ -415,6 +468,7 @@ class InterviewReportForm(BaseRecruitForm):
         required=False,
         widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 3})
     )
+    # 応募者情報
     unique_question_answer = forms.CharField(
         label='ユニークな質問の回答',
         required=False,
@@ -534,16 +588,19 @@ class InterviewReportForm(BaseRecruitForm):
     class Meta:
         model = Recruit
         fields = [
-            'interview_day', 'interviewer', 'interview_feedback', 'unique_question_answer',
-            'curriculum', 'area', 'relocation_plan', 'commuting_method',
-            'time_to_office', 'join_company', 'parallels_company',
-            'medical_condition', 'medical_details', 'final_education',
-            'learning_level', 'job_change', 'last_job_duration', 'why_it',
+            'interview_day', 'interviewer', 'interview_feedback',
+            'unique_question_answer', 'curriculum', 'area',
+            'relocation_plan', 'commuting_method', 'time_to_office',
+            'join_company', 'parallels_company', 'medical_condition',
+            'medical_details', 'final_education', 'learning_level',
+            'job_change', 'last_job_duration', 'why_it',
             'attraction_1', 'attraction_2', 'attraction_3', 'attraction_4',
             'vision_1', 'vision_2', 'vision_3', 'tattoo'
         ]
 
+# オファー報告フォーム：オファー面談の詳細情報を管理
 class OfferReportForm(BaseRecruitForm):
+    # オファー基本情報
     offer_manager = forms.CharField(
         label='オファー面談担当者',
         required=False,
@@ -564,6 +621,7 @@ class OfferReportForm(BaseRecruitForm):
         required=False,
         widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 3})
     )
+    # 応募者情報
     other_company = forms.CharField(
         label='他社',
         required=False,

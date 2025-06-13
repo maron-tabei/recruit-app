@@ -86,7 +86,7 @@ class Recruit(models.Model):
     
     # 面接情報
     interview_day = models.DateField(blank=True, null=True, verbose_name='面接日程')
-    interview_url = models.URLField(blank=True, null=True, verbose_name='URL')
+    interview_url = models.URLField(blank=True, null=True, verbose_name='面接URL')
     interview_result = models.CharField(
         max_length=50,
         blank=True,
@@ -114,8 +114,8 @@ class Recruit(models.Model):
     
     # オファー情報
     offer_day = models.DateField(blank=True, null=True, verbose_name='オファー面談日程')
-    offer_url = models.URLField(blank=True, null=True, verbose_name='URL')
-    offer_accepted = models.BooleanField(default=False, verbose_name='内定')
+    offer_url = models.URLField(blank=True, null=True, verbose_name='オファ面URL')
+    offer_accepted = models.BooleanField(default=False, verbose_name='内定承諾')
     offer_reminder_email = models.CharField(
         max_length=50,
         blank=True,

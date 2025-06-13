@@ -287,63 +287,62 @@
                     <form method="post" class="needs-validation" novalidate>
                         {% csrf_token %}
                         
-                        {% if is_edit %}
-                        <!-- カテゴリ選択タブ -->
-                        <ul class="nav nav-tabs mb-4" id="formTabs" role="tablist">
+                        <!-- タブナビゲーション -->
+                        <ul class="nav nav-tabs" id="formTabs" role="tablist">
                             <li class="nav-item" role="presentation">
-                                <button class="nav-link {% if form_type == 'personal' %}active{% endif %}" 
+                                <button class="nav-link {% if form_type == 'personal' or not is_edit %}active{% endif %}" 
                                         id="personal-tab" data-bs-toggle="tab" data-bs-target="#personal" type="button" role="tab"
-                                        aria-controls="personal" aria-selected="{% if form_type == 'personal' %}true{% else %}false{% endif %}">
-                                    <i class="bi bi-person me-2"></i>個人情報
+                                        aria-controls="personal" aria-selected="{% if form_type == 'personal' or not is_edit %}true{% else %}false{% endif %}">
+                                    <i class="fas fa-user me-2"></i>基本情報
                                 </button>
                             </li>
                             <li class="nav-item" role="presentation">
                                 <button class="nav-link {% if form_type == 'progress' %}active{% endif %}" 
                                         id="progress-tab" data-bs-toggle="tab" data-bs-target="#progress" type="button" role="tab"
                                         aria-controls="progress" aria-selected="{% if form_type == 'progress' %}true{% else %}false{% endif %}">
-                                    <i class="bi bi-clipboard-check me-2"></i>進捗管理
+                                    <i class="fas fa-tasks me-2"></i>進捗管理
                                 </button>
                             </li>
                             <li class="nav-item" role="presentation">
                                 <button class="nav-link {% if form_type == 'interview' %}active{% endif %}" 
                                         id="interview-tab" data-bs-toggle="tab" data-bs-target="#interview" type="button" role="tab"
                                         aria-controls="interview" aria-selected="{% if form_type == 'interview' %}true{% else %}false{% endif %}">
-                                    <i class="bi bi-calendar-check me-2"></i>面接報告
+                                    <i class="fas fa-comments me-2"></i>面接報告
                                 </button>
                             </li>
                             <li class="nav-item" role="presentation">
                                 <button class="nav-link {% if form_type == 'offer' %}active{% endif %}" 
                                         id="offer-tab" data-bs-toggle="tab" data-bs-target="#offer" type="button" role="tab"
                                         aria-controls="offer" aria-selected="{% if form_type == 'offer' %}true{% else %}false{% endif %}">
-                                    <i class="bi bi-hand-thumbs-up me-2"></i>オファ面報告
+                                    <i class="fas fa-handshake me-2"></i>オファー報告
                                 </button>
                             </li>
                         </ul>
-                        {% endif %}
 
-                        <div class="tab-content" id="formTabsContent">
-                            <!-- 個人情報フォーム -->
+                        <!-- タブコンテンツ -->
+                        <div class="tab-content mt-4" id="formTabsContent">
+                            <!-- 基本情報タブ -->
                             <div class="tab-pane fade {% if form_type == 'personal' or not is_edit %}show active{% endif %}" 
                                  id="personal" role="tabpanel" aria-labelledby="personal-tab">
-                                {% include "recruit/partials/personal_info_form.html" %}
+                                {% include "recruit/partials/personal_info_form.html" with personal_form=personal_form %}
                             </div>
 
-                            <!-- 進捗管理フォーム -->
+                            <!-- 進捗管理タブ -->
                             <div class="tab-pane fade {% if form_type == 'progress' %}show active{% endif %}" 
                                  id="progress" role="tabpanel" aria-labelledby="progress-tab">
-                                {% include "recruit/partials/progress_form.html" %}
+                                {% include "recruit/partials/progress_form.html" with progress_form=progress_form %}
                             </div>
 
-                            <!-- 面接報告フォーム -->
+                            <!-- 面接報告タブ -->
                             <div class="tab-pane fade {% if form_type == 'interview' %}show active{% endif %}" 
                                  id="interview" role="tabpanel" aria-labelledby="interview-tab">
-                                {% include "recruit/partials/interview_report_form.html" %}
+                                {% include "recruit/partials/interview_form.html" with interview_form=interview_form %}
                             </div>
 
-                            <!-- オファ面報告フォーム -->
+                            <!-- オファー報告タブ -->
                             <div class="tab-pane fade {% if form_type == 'offer' %}show active{% endif %}" 
                                  id="offer" role="tabpanel" aria-labelledby="offer-tab">
-                                {% include "recruit/partials/offer_report_form.html" %}
+                                {% include "recruit/partials/offer_form.html" with offer_form=offer_form %}
                             </div>
                         </div>
 
