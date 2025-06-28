@@ -325,19 +325,19 @@
                             <div class="tab-pane fade {% if form_type == 'personal' or not is_edit %}show active{% endif %}" 
                                  id="personal" role="tabpanel" aria-labelledby="personal-tab">
                                 {% include "recruit/partials/personal_info_form.html" with personal_form=personal_form %}
-                            </div>
+                        </div>
 
                             <!-- 進捗管理タブ -->
                             <div class="tab-pane fade {% if form_type == 'progress' %}show active{% endif %}" 
                                  id="progress" role="tabpanel" aria-labelledby="progress-tab">
                                 {% include "recruit/partials/progress_form.html" with progress_form=progress_form %}
-                            </div>
+                        </div>
 
                             <!-- 面接報告タブ -->
                             <div class="tab-pane fade {% if form_type == 'interview' %}show active{% endif %}" 
                                  id="interview" role="tabpanel" aria-labelledby="interview-tab">
                                 {% include "recruit/partials/interview_form.html" with interview_form=interview_form %}
-                            </div>
+                        </div>
 
                             <!-- オファー報告タブ -->
                             <div class="tab-pane fade {% if form_type == 'offer' %}show active{% endif %}" 
